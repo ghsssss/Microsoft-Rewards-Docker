@@ -14,3 +14,4 @@ note
 .env.*
 *.bak
 *.log
+.github/workflows/
