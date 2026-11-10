@@ -1,0 +1,64 @@
+Microsoft Rewards Script v5.0.0 - NAS Docker 部署包
+=====================================================
+
+本目录已准备好全部所需文件，上传到 NAS 后只需 3 步。
+
+准备工作
+--------
+1. 编辑 .env 文件，填入你的微软账号：
+      ACCOUNT_1_EMAIL=你的邮箱
+      ACCOUNT_1_PASSWORD=你的密码
+   多账号按注释复制 ACCOUNT_2、ACCOUNT_3 ...
+2. （可选）编辑 config\config.json 调整行为，默认即可。
+3. 把整个文件夹上传到 NAS，例如 /docker/microsoft-rewards/
+   （.env 是隐藏文件，注意确认它已上传）
+
+方式一：群晖 DSM（Container Manager）
+-------------------------------------
+1. File Station：把文件夹上传到 docker 共享文件夹。
+2. 打开 Container Manager -> 项目(Project) -> 新增。
+3. 路径选择上传的文件夹，来源选"使用已有的 docker-compose.yaml"
+   （即本目录的 compose.yaml）。
+4. 一路下一步 -> 完成，等待构建（首次约 5-10 分钟）。
+
+方式二：飞牛 fnOS / 其他支持 Compose 的界面
+-------------------------------------------
+在 Docker/Compose 应用中"从 compose.yaml 创建项目"，
+选择本文件夹即可，步骤同上。
+
+方式三：SSH 命令行（通用）
+--------------------------
+ssh 登录 NAS 后执行：
+   cd /volume1/docker/microsoft-rewards    # 按实际路径修改
+   docker compose up -d --build
+
+日常使用
+--------
+- 查看日志:   docker logs -f microsoft-rewards-script
+- 手动重启:   docker restart microsoft-rewards-script
+- 停止:       docker compose down
+- 改了 .env 或 config 后需要重启容器才生效。
+
+默认行为
+--------
+- 时区: Asia/Shanghai
+- 每天 07:00 运行一次（CRON_SCHEDULE: '0 7 * * *'，可在 compose.yaml 改）
+- 容器启动时立即运行一次（RUN_ON_START: 'true'）
+- 登录会话保存在 ./sessions/sessions.db（SQLite），删除该文件可强制全部账号重新登录。
+
+进阶：Control API（可选，已启用）
+--------------------------------
+注意：3010 端口是纯 API 服务，官方没有网页界面
+（配套的网页 Dashboard 是尚未发布的独立项目）。
+用 PowerShell 调用，例如：
+   $token = "你的API_TOKEN（在 .env 里）"
+   $h = @{ Authorization = "Bearer $token" }
+   $api = "http://NAS_IP:3010"
+   Invoke-RestMethod "$api/status"  -Headers $h   # 运行状态
+   Invoke-RestMethod "$api/points"  -Headers $h   # 积分余额
+   Invoke-RestMethod "$api/history" -Headers $h   # 运行历史
+   Invoke-RestMethod "$api/start" -Method Post -Headers $h -ContentType 'application/json' -Body '{}'  # 立即运行
+全部端点列表: Invoke-RestMethod "$api/" -Headers $h
+API_TOKEN 已生成并写入 .env 和 compose.yaml（2026-11-08 部署时已配置）。
+
+项目主页: https://github.com/TheNetsky/Microsoft-Rewards-Script
