@@ -3,6 +3,7 @@ import type { LogLevel } from './Logger'
 import { sendDiscord, flushDiscordQueue } from './Discord'
 import { sendNtfy, flushNtfyQueue } from './Ntfy'
 import { sendTelegram, flushTelegramQueue } from './Telegram'
+import { sendDingTalk, flushDingTalkQueue } from './DingTalk'
 import { logSystemMessage } from './LogEvent'
 import type { LogColor } from './LogStyle'
 
@@ -18,10 +19,17 @@ export async function sendNotifications(
     if (config.ntfy?.enabled && config.ntfy.url) requests.push(sendNtfy(config.ntfy, content, level))
     if (config.telegram?.enabled && config.telegram.botToken && config.telegram.chatId)
         requests.push(sendTelegram(config.telegram, content, level))
+    if (config.dingtalk?.enabled && config.dingtalk.accessToken)
+        requests.push(sendDingTalk(config.dingtalk, content, level))
     for (const result of await Promise.allSettled(requests))
         if (result.status === 'rejected') logSystemMessage('warn', 'NOTIFICATIONS', 'Could not queue notification.')
 }
 
 export async function flushNotifications(timeoutMs: number): Promise<void> {
-    await Promise.allSettled([flushDiscordQueue(timeoutMs), flushNtfyQueue(timeoutMs), flushTelegramQueue(timeoutMs)])
+    await Promise.allSettled([
+        flushDiscordQueue(timeoutMs),
+        flushNtfyQueue(timeoutMs),
+        flushTelegramQueue(timeoutMs),
+        flushDingTalkQueue(timeoutMs)
+    ])
 }

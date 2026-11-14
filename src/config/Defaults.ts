@@ -56,6 +56,7 @@ export const defaultConfig: Config = {
     webhook: {
         discord: { enabled: false, url: '' },
         telegram: { enabled: false, botToken: '', chatId: '' },
+        dingtalk: { enabled: false, accessToken: '', secret: '' },
         ntfy: {
             enabled: false,
             url: '',

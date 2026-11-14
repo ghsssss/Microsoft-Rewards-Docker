@@ -116,6 +116,13 @@ const WebhookSchema = z.strictObject({
             chatId: z.union([z.string(), z.number()])
         })
         .optional(),
+    dingtalk: z
+        .strictObject({
+            enabled: z.boolean().optional(),
+            accessToken: z.string(),
+            secret: z.string().optional()
+        })
+        .optional(),
     webhookLogFilter: LogFilterSchema
 })
 

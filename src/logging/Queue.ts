@@ -7,12 +7,13 @@ interface IdleQueue {
     onIdle(): Promise<void>
 }
 
-export function createNotificationQueue(): PQueue {
+export function createNotificationQueue(options?: { interval?: number; intervalCap?: number }): PQueue {
     return new PQueue({
         concurrency: 1,
         interval: 1000,
         intervalCap: 2,
-        carryoverConcurrencyCount: true
+        carryoverConcurrencyCount: true,
+        ...options
     })
 }
 

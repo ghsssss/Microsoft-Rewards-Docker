@@ -84,6 +84,7 @@ export interface ConfigWebhook {
     discord?: WebhookDiscordConfig
     ntfy?: WebhookNtfyConfig
     telegram?: WebhookTelegramConfig
+    dingtalk?: WebhookDingTalkConfig
     webhookLogFilter: LogFilter
 }
 
@@ -114,4 +115,10 @@ export interface WebhookTelegramConfig {
     enabled?: boolean
     botToken: string
     chatId: string | number
+}
+
+export interface WebhookDingTalkConfig {
+    enabled?: boolean
+    accessToken: string
+    secret?: string
 }
